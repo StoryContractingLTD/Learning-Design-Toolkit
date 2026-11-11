@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body style="margin:0">
+<title>Learning Design Toolkit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;1,800&display=swap">
+<style>
+/* Layout: Story Blue brand bar, project strip, stage rail on the left and a working canvas on the right; on phones the rail becomes a horizontal strip */
+:root{
+  --blue:#0061ad;          /* Story Blue: brand bar, always */
+  --accent:#0061ad;        /* interactive accent */
+  --accent-soft:#e3eef8;
+  --teal:#01a4ab; --teal-soft:#dff3f4;
+  --amber:#b87d00; --amber-soft:#fcf1d8;
+  --green:#4f8a1c; --green-soft:#eaf3df;
+  --bg:#f3f5f7; --surface:#ffffff; --sunk:#eceff2;
+  --fg:#2d3238; --muted:#60666d; --line:#d6dadf; --filler:#dee0e1;
+  --b1:#9fd6d8; --b2:#5fbfc3; --b3:#01a4ab; --b4:#2f86c9; --b5:#0061ad; --b6:#22357a;
+  --font-head:"Montserrat", Arial, "Helvetica Neue", sans-serif;
+  --font-body:Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --r:8px; --danger:#b3261e;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --accent:#6fb3ea; --accent-soft:#1a2d40;
+  --teal:#45c9ce; --teal-soft:#14302f;
+  --amber:#f0b84a; --amber-soft:#33280f;
+  --green:#97cc62; --green-soft:#1f2c14;
+  --bg:#10161d; --surface:#18212b; --sunk:#131b23;
+  --fg:#e4e8ec; --muted:#a3acb5; --line:#2c3a48; --filler:#26323e; --danger:#ff8a80;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --accent:#6fb3ea; --accent-soft:#1a2d40;
+  --teal:#45c9ce; --teal-soft:#14302f;
+  --amber:#f0b84a; --amber-soft:#33280f;
+  --green:#97cc62; --green-soft:#1f2c14;
+  --bg:#10161d; --surface:#18212b; --sunk:#131b23;
+  --fg:#e4e8ec; --muted:#a3acb5; --line:#2c3a48; --filler:#26323e; --danger:#ff8a80;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.55}
+h1,h2,h3,h4{font-family:var(--font-head);font-weight:600;line-height:1.25;text-wrap:balance;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* brand bar */
+.brand{background:var(--blue);color:#fff}
+.brand .in{display:flex;align-items:center;gap:16px;padding-block:12px;max-width:1280px;margin:0 auto}
+.logo{font-family:var(--font-head);font-style:italic;font-weight:800;font-size:26px;letter-spacing:-.01em;line-height:1;color:#fff;background:#0062ad;padding:4px 2px}
+.brand .t{font-family:var(--font-head);font-weight:600;font-size:15px;border-left:1px solid rgba(255,255,255,.4);padding-left:16px}
+.brand .strap{margin-left:auto;font-size:12px;opacity:.9;letter-spacing:.04em;text-transform:uppercase}
+
+/* project strip */
+.pstrip{background:var(--surface);border-bottom:1px solid var(--line)}
+.pstrip .in{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding-block:10px;max-width:1280px;margin:0 auto}
+.pstrip label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.pstrip select{min-width:0;max-width:260px}
+#pName{flex:1 1 220px;min-width:0;font-family:var(--font-head);font-weight:600;font-size:16px;border:1px solid transparent;background:transparent;padding:6px 8px;border-radius:6px}
+#pName:hover{border-color:var(--line)}
+#pName:focus{border-color:var(--accent);background:var(--surface)}
+.status{font-size:12px;color:var(--muted);white-space:nowrap}
+.status.ok::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px}
+.status.warn::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--amber);margin-right:6px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:6px;cursor:pointer;font-size:14px;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{filter:brightness(1.1);color:#fff}
+.btn.danger{color:var(--danger)}
+.btn.danger.armed{background:#b3261e;color:#fff;border-color:#b3261e}
+.btn.small{padding:4px 9px;font-size:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+.banner{max-width:1280px;margin:12px auto 0;background:var(--amber-soft);border:1px solid var(--amber);color:var(--fg);border-radius:var(--r);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:14px}
+.banner b{font-family:var(--font-head);font-weight:600}
+
+/* shell */
+.shell{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;padding-block:20px 48px}
+nav.rail{position:sticky;top:12px;align-self:start}
+.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.rail button{width:100%;display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:6px;cursor:pointer}
+.rail button:hover{background:var(--sunk)}
+.rail button[aria-current="step"]{background:var(--accent-soft)}
+.rail button[aria-current="step"] .nm{color:var(--accent);font-weight:bold}
+.rail .no{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-family:var(--font-head);font-weight:600;border:1.5px solid var(--line);color:var(--muted);background:var(--surface)}
+.rail .done .no{background:var(--green);border-color:var(--green);color:#fff}
+.rail .nm{font-size:14px}
+.rail .pc{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.overall{margin:14px 10px 0;font-size:12px;color:var(--muted)}
+.meter{height:6px;border-radius:3px;background:var(--filler);overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;background:var(--teal);transition:width .3s}
+
+main{min-width:0}
+.stage-head{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);font-weight:bold}
+.stage-head h2{font-size:26px}
+.stage-head p{margin:0;color:var(--muted);max-width:68ch}
+
+details.guide{background:var(--teal-soft);border-radius:var(--r);padding:0;margin-bottom:20px;border:1px solid color-mix(in srgb,var(--teal) 35%,transparent)}
+details.guide summary{cursor:pointer;padding:12px 16px;font-family:var(--font-head);font-weight:600;font-size:14px;list-style:none;display:flex;align-items:center;gap:8px}
+details.guide summary::-webkit-details-marker{display:none}
+details.guide summary::before{content:"+";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--teal);color:#fff;font-size:15px;line-height:1}
+details.guide[open] summary::before{content:"–"}
+.guide .gb{padding:0 16px 14px 44px;max-width:80ch}
+.guide .gb p{margin:.4em 0}
+.guide .gb ul{margin:.4em 0;padding-left:1.2em}
+.guide .gb li{margin:.2em 0}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:18px;margin-bottom:18px}
+.panel > h3{font-size:17px}
+.panel > .sub{margin:-12px 0 0;color:var(--muted);font-size:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field > label,.field > .lbl{font-weight:bold;font-size:14px}
+.hint{font-size:13px;color:var(--muted);margin:-2px 0 2px}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:9px 11px;min-width:0}
+textarea{min-height:84px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:2px solid color-mix(in srgb,var(--accent) 30%,transparent);outline-offset:0}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .chip[aria-pressed="true"]{color:#0b1520}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#0b1520}}
+
+.checks{display:flex;flex-direction:column;gap:2px}
+.checks h4{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:10px 0 4px}
+.checks h4:first-child{margin-top:0}
+.ck{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;padding:7px 8px;border-radius:6px;cursor:pointer}
+.ck:hover{background:var(--sunk)}
+.ck input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--teal)}
+.ck small{display:block;color:var(--muted);font-size:12.5px}
+.ck .ref{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:6px}
+.ck.on > span{color:var(--muted)}
+
+.readout{border-radius:var(--r);padding:12px 14px;font-size:14px;border:1px solid var(--line);background:var(--sunk)}
+.readout.good{background:var(--green-soft);border-color:var(--green)}
+.readout.warn{background:var(--amber-soft);border-color:var(--amber)}
+.readout b{font-family:var(--font-head);font-weight:600}
+
+/* Bloom */
+.stair{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;align-items:end}
+.step{border:0;cursor:pointer;border-radius:6px 6px 0 0;padding:10px 6px;text-align:center;font-family:var(--font-head);font-weight:600;font-size:13px;color:#fff;position:relative}
+.step small{display:block;font-family:var(--font-body);font-weight:normal;font-size:11px;opacity:.9}
+.step[aria-pressed="true"]{outline:3px solid var(--fg);outline-offset:2px}
+.step.l1{background:var(--b1);color:#0d3436;height:60px}.step.l2{background:var(--b2);color:#0d3436;height:74px}.step.l3{background:var(--b3);color:#06292b;height:88px}
+.step.l4{background:var(--b4);height:102px}.step.l5{background:var(--b5);height:116px}.step.l6{background:var(--b6);height:130px}
+.lvl-info{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px}
+.verbs{display:flex;flex-wrap:wrap;gap:6px}
+.composer{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end}
+.preview{font-size:15px;padding:12px 14px;border-radius:6px;background:var(--sunk);border:1px dashed var(--line)}
+.preview em{color:var(--muted)}
+.olist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.oitem{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:bold;white-space:nowrap;padding:3px 8px;border-radius:999px;background:var(--sunk);border:1px solid var(--line)}
+.badge i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.flag{font-size:12px;color:var(--amber);font-weight:bold}
+.dist{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--filler)}
+.dist span{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--line)}
+th{font-family:var(--font-head);font-weight:600;font-size:13px;background:var(--sunk)}
+tr:last-child td{border-bottom:0}
+td textarea{min-height:64px;font-size:14px}
+td select{font-size:14px}
+.lvlcell{font-family:var(--font-head);font-weight:600}
+.lvlcell small{display:block;font-family:var(--font-body);font-weight:normal;color:var(--muted);font-size:12px}
+
+/* storyboard */
+.sb{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:scr}
+.scr{border:1px solid var(--line);border-radius:var(--r);padding:14px;background:var(--surface);display:flex;flex-direction:column;gap:12px}
+.scr-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.scr-h .n{font-family:var(--font-head);font-weight:600;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.scr-h input{flex:1 1 200px}
+.scr-h .tools{display:flex;gap:6px}
+.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+
+/* brief */
+.brief{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;max-width:860px}
+.brief h3{font-size:20px;color:var(--accent);margin:0 0 4px}
+.brief h4{font-size:15px;margin:20px 0 6px;padding-bottom:4px;border-bottom:2px solid var(--filler)}
+.brief p{margin:.3em 0}
+.brief dl{display:grid;grid-template-columns:180px minmax(0,1fr);gap:4px 14px;margin:0}
+.brief dt{color:var(--muted);font-size:13px}
+.brief dd{margin:0}
+.brief ul{margin:.3em 0;padding-left:1.2em}
+.brief .gap{color:var(--muted);font-style:italic}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:8px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:6px;font-size:14px;z-index:20}
+
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:12px;padding-top:8px}
+  nav.rail{position:static;overflow-x:auto;margin-inline:-16px;padding-inline:16px}
+  .rail ol{flex-direction:row;gap:4px;width:max-content}
+  .rail button{grid-template-columns:24px auto;padding:6px 10px}
+  .rail .pc{display:none}
+  .overall{display:none}
+  .grid2,.lvl-info,.composer{grid-template-columns:minmax(0,1fr)}
+  .brand .strap{display:none}
+  .stair .step small{display:none}
+  .brief dl{grid-template-columns:minmax(0,1fr)}
+  .brief dt{margin-top:6px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="brand"><div class="in gut">
+  <span class="logo" aria-label="Story">STORY</span>
+  <span class="t">Learning Design Toolkit</span>
+  <span class="strap">Learning &amp; Development</span>
+</div></header>
+
+<div class="pstrip"><div class="in gut">
+  <label for="pSel">Project</label>
+  <select id="pSel" aria-label="Choose a project"></select>
+  <input id="pName" type="text" aria-label="Project name" placeholder="Name this project">
+  <button class="btn primary" data-act="newProject" type="button">+ New project</button>
+  <button class="btn" data-act="dupProject" type="button">Duplicate</button>
+  <button class="btn danger" data-act="delProject" id="delBtn" type="button">Delete</button>
+  <span class="status" id="status" role="status">Loading…</span>
+</div></div>
+
+<div class="gut"><div class="banner" id="exBanner" hidden>
+  <span><b>Worked example.</b> This sample project shows how a finished design looks. Edits here aren't saved.</span>
+  <button class="btn small primary" data-act="newProject" type="button">Start my own project</button>
+  <button class="btn small" data-act="dupProject" type="button">Copy this example</button>
+</div></div>
+
+<div class="shell gut">
+  <nav class="rail" aria-label="Design stages"><ol id="rail"></ol>
+    <div class="overall"><span id="overallTxt">0% complete</span><div class="meter"><i id="overallBar" style="width:0"></i></div></div>
+  </nav>
+  <main id="main" tabindex="-1"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+
+/* ---------- Bloom's (revised, Anderson & Krathwohl 2001) ---------- */
+const BLOOM = [
+ {n:1,name:"Remember",desc:"Recall facts, terms and basic procedures.",verbs:["list","name","identify","recall","state","define","label","recognise","match"],
+  assess:["Multiple-choice question","Matching / drag-and-drop","Label a diagram","Quick-fire quiz (e.g. Kahoot)"],
+  act:["Flashcards or knowledge check","Spot the sign / symbol","Short recap quiz"]},
+ {n:2,name:"Understand",desc:"Explain ideas in their own words and give examples.",verbs:["explain","describe","summarise","classify","compare","interpret","give examples of","paraphrase"],
+  assess:["Explain in own words (short answer)","Sort / classify examples","MCQ with reasoning","Teach-back to a supervisor"],
+  act:["Sorting activity","Worked example with commentary","Discussion prompt"]},
+ {n:3,name:"Apply",desc:"Use a procedure or rule in a real work situation.",verbs:["apply","carry out","demonstrate","use","complete","calculate","select","follow","implement"],
+  assess:["Scenario-based question","Practical observation on site","Software simulation","Workplace task sign-off"],
+  act:["Guided practice","Simulation / try-it","Job aid used on a real task"]},
+ {n:4,name:"Analyse",desc:"Break a situation down, spot causes and patterns.",verbs:["analyse","differentiate","investigate","spot","examine","break down","prioritise","diagnose"],
+  assess:["Spot-the-hazard image or video","Case study diagnosis","Root-cause exercise","Compare two methods"],
+  act:["Hotspot image exploration","Incident case review","5 Whys exercise"]},
+ {n:5,name:"Evaluate",desc:"Make and justify a judgement or decision.",verbs:["evaluate","assess","judge","justify","recommend","decide","critique","defend"],
+  assess:["Branching scenario with consequences","Critique a RAMS or document","Justify a decision with rationale","Peer review"],
+  act:["Branching scenario","Debate or decision game","Review a real example"]},
+ {n:6,name:"Create",desc:"Produce something new: a plan, product or solution.",verbs:["design","plan","produce","develop","construct","write","propose","build"],
+  assess:["Produce a plan or briefing","Project / portfolio piece","Deliver a toolbox talk","Design a solution to a brief"],
+  act:["Project work","Plan-and-present task","Coaching conversation"]}
+];
+const VAGUE = /\b(understand|know|be aware|aware of|appreciate|learn about|be familiar|familiarise|realise|grasp)\b/i;
+
+/* ---------- Stage definitions ---------- */
+const DELIVERY = ["Actus eLearning (Rise)","Actus eLearning (Storyline)","Classroom workshop","Toolbox talk","Virtual session (Teams)","Blended","Video","Job aid / quick reference","Coaching / on the job"];
+const STAGES = [
+ {id:"setup",name:"Project setup",intro:"Agree the request, people and constraints before anything is designed.",
+  guide:`<p>Capture the request as it was given, then pin down who owns it and what's fixed.</p><ul><li>Who asked for this, and who will sign it off?</li><li>What's driving it now: an incident, an audit, a new process, a client requirement?</li><li>What's fixed: deadline, budget, delivery channel, mandatory content?</li><li>Write a one-line problem statement you'd be happy to read back to the sponsor.</li></ul>`,
+  blocks:[{panel:"The request",items:[
+    {t:"row",items:[{t:"text",k:"requester",label:"Requested by"},{t:"text",k:"sponsor",label:"Sponsor / sign-off"}]},
+    {t:"row",items:[{t:"text",k:"sme",label:"Subject matter expert(s)"},{t:"date",k:"deadline",label:"Target launch date"}]},
+    {t:"textarea",k:"problem",label:"Problem statement",hint:"One or two sentences. What's going wrong, for whom, and why it matters to Story."},
+    {t:"textarea",k:"context",label:"Why now?",hint:"Trigger for the request, e.g. incident trend, audit finding, new legislation."}
+  ]},{panel:"Shape of the solution",items:[
+    {t:"chips",k:"delivery",label:"Likely delivery",hint:"Pick any that apply. You can change this after the needs analysis.",opts:DELIVERY},
+    {t:"row",items:[{t:"text",k:"duration",label:"Learner time budget",hint:"e.g. 20 minutes, half-day"},{t:"select",k:"mandatory",label:"Status",opts:["","Mandatory / compliance","Role-required","Recommended","Voluntary (library)"]}]},
+    {t:"textarea",k:"constraints",label:"Constraints and dependencies",hint:"Budget, SME availability, LMS limits, site access, union or client approval."}
+  ]}]},
+ {id:"needs",name:"Needs analysis",intro:"Check the gap is real and that learning is the right fix before building anything.",
+  guide:`<p>Start with the business result, then work back to what people need to do differently.</p><ul><li><b>Goal:</b> what measurable result should improve? (incidents, rework, audit scores, time)</li><li><b>Gap:</b> what do people do now, and what should they do instead?</li><li><b>Cause:</b> if their job depended on it, could they do it right now? If yes, the problem probably isn't knowledge or skill.</li><li><b>Evidence:</b> look at incident data, audits, observations and conversations with the people doing the job.</li></ul><p>Training fixes knowledge and skill gaps. Tools, process, workload and motivation gaps usually need a different fix, or training plus something else.</p>`,
+  blocks:[{panel:"Performance gap",items:[
+    {t:"textarea",k:"goal",label:"Business goal",hint:"The measurable result this should move, e.g. reduce manual handling RIDDORs by 25% in 12 months."},
+    {t:"row",items:[{t:"textarea",k:"current",label:"What people do now"},{t:"textarea",k:"desired",label:"What they should do instead"}]},
+    {t:"textarea",k:"evidence",label:"Evidence of the gap",hint:"Data sources and what they show."}
+  ]},{panel:"Root cause",sub:"What's stopping people performing? Choose every cause the evidence supports.",items:[
+    {t:"chips",k:"causes",label:"Causes",opts:["Knowledge","Skill / practice","Motivation / attitude","Tools or equipment","Process or procedure","Time / workload","Information / communication","Environment / site conditions"]},
+    {t:"custom",render:"causeReadout"},
+    {t:"textarea",k:"nontraining",label:"Non-training actions",hint:"Fixes for causes training won't solve, and who owns them."}
+  ]},{panel:"Evidence gathered",items:[
+    {t:"checks",k:"na",items:[["Spoke to the sponsor about the business goal"],["Interviewed SMEs"],["Spoke to people who do the job"],["Observed the task on site or in the office"],["Reviewed incident, audit or performance data"],["Checked for existing learning on Actus"]]}
+  ]}]},
+ {id:"learners",name:"Learner profile",intro:"Who the learners are and where they'll be when they learn.",
+  guide:`<p>Design for the real person on the real device. Site-based colleagues often learn on their own phone, in short gaps, in noisy places.</p><ul><li>Assume variable literacy and digital confidence unless you know otherwise.</li><li>Ask about shift patterns, connectivity and whether learning time is paid and protected.</li><li>Note anything that changes access: hearing, sight, dyslexia, ADHD, English as an additional language.</li><li>Speak to two or three real learners. A quick chat beats any assumption.</li></ul>`,
+  blocks:[{panel:"Who they are",items:[
+    {t:"row",items:[{t:"text",k:"roles",label:"Roles / job titles"},{t:"text",k:"headcount",label:"Approximate number"}]},
+    {t:"row",items:[{t:"select",k:"workpattern",label:"Work pattern",opts:["","Site-based","Office-based","Mixed site and office","Field / mobile","Depot / yard"]},{t:"select",k:"digital",label:"Digital confidence",opts:["","Low","Mixed","Good","High"]}]},
+    {t:"chips",k:"devices",label:"Devices they'll use",opts:["Own phone (BYOD)","Company phone","Company laptop","Tablet","Shared PC / kiosk","No device: face to face only"]},
+    {t:"textarea",k:"prior",label:"What they already know",hint:"Prior training, experience, cards held (e.g. CSCS, PTS)."}
+  ]},{panel:"Barriers and inclusion",items:[
+    {t:"textarea",k:"motivation",label:"What's in it for them? Likely barriers?",hint:"Motivators, frustrations, previous experience of training."},
+    {t:"textarea",k:"inclusion",label:"Access and inclusion considerations",hint:"Literacy, language, neurodiversity, sensory needs, connectivity, noise."},
+    {t:"textarea",k:"persona",label:"Persona snapshot",hint:"Two or three lines describing a typical learner in their own words."}
+  ]}]},
+ {id:"outcomes",name:"Learning outcomes",intro:"Write measurable outcomes using Bloom's taxonomy, pitched at the level the job needs.",
+  guide:`<p>A good outcome says what the learner will be able to <b>do</b>, in terms you could observe or assess.</p><ul><li>Use one action verb per outcome. Avoid "understand", "know" and "be aware of": you can't see them.</li><li>Pitch the level at the job. Most workplace learning should reach <b>Apply</b> or higher.</li><li>Add a condition or standard where it helps: "using the site lift plan", "without prompts".</li><li>Aim for 3 to 5 outcomes per module. More usually means the module is too big.</li></ul><p>Pattern: <i>By the end, learners will be able to</i> + verb + what + condition/standard.</p>`,
+  custom:"bloom"},
+ {id:"assessment",name:"Assessment",intro:"Match every outcome to an assessment at the same Bloom's level.",
+  guide:`<p>Constructive alignment: the outcome, the practice activity and the assessment should all sit at the same level.</p><ul><li>An "Apply" outcome needs an applied assessment, such as a scenario or observation, not a recall quiz.</li><li>Use formative checks during the learning and a summative check at the end.</li><li>Write plausible distractors based on real mistakes people make on site.</li><li>Avoid trick questions, double negatives and "all of the above".</li></ul>`,
+  custom:"assess",
+  blocks:[{panel:"Assessment rules",items:[
+    {t:"row",items:[{t:"text",k:"passmark",label:"Pass mark",hint:"e.g. 80%"},{t:"text",k:"attempts",label:"Attempts allowed",hint:"e.g. Unlimited, with feedback"}]},
+    {t:"textarea",k:"formative",label:"Formative checks",hint:"Low-stakes practice during the learning."},
+    {t:"textarea",k:"summative",label:"Summative assessment",hint:"What proves competence, and who records it."},
+    {t:"checks",k:"as",items:[["Every outcome has an assessment"],["Assessment level matches outcome level"],["Questions test application, not just recall"],["Distractors are plausible, based on real errors"],["No trick questions or double negatives"],["Question bank big enough for retakes"]]}
+  ]}]},
+ {id:"design",name:"Design & storyboard",intro:"Choose the format, chunk the content and plan each screen or section.",
+  guide:`<p>Start from the practice activities, then add only the content people need to do them well.</p><ul><li>Keep chunks short: 5 to 10 minutes each works well on a phone.</li><li>Open with a realistic Story scenario or problem, not a list of objectives.</li><li>Put practice before the final assessment.</li><li>Every screen should link to an outcome. If it doesn't, question whether it's needed.</li><li>Plan alt text and captions now, not at build.</li></ul>`,
+  custom:"storyboard",
+  blocks:[{panel:"Design approach",items:[
+    {t:"chips",k:"modality",label:"Final format",opts:DELIVERY},
+    {t:"chips",k:"interactions",label:"Main interaction types",opts:["Scenario / branching","Knowledge check","Drag and drop","Hotspot / spot the hazard","Tabs / accordion","Video","Click to reveal","Simulation","Reflection prompt","Downloadable job aid"]},
+    {t:"row",items:[{t:"text",k:"seat",label:"Total seat time"},{t:"select",k:"tone",label:"Tone of voice",opts:["","Conversational and direct","Formal and procedural","Story-led / narrative","Peer-to-peer"]}]},
+    {t:"textarea",k:"hook",label:"Opening hook or scenario",hint:"The real-world situation that frames the learning."},
+    {t:"textarea",k:"chunking",label:"Structure and chunking",hint:"Sections, order and rough timings."}
+  ]}]},
+ {id:"feedback",name:"Feedback",intro:"Plan how learners find out how they're doing and what to do next.",
+  guide:`<p>Good feedback answers three questions (Hattie &amp; Timperley): <b>Where am I going?</b> <b>How am I doing?</b> <b>What next?</b></p><ul><li>Focus on the task, not the person. Say why an answer is right or wrong.</li><li>Keep it short and specific, then point to the next step or the screen to revisit.</li><li>Show consequences in scenarios: what happens on site if they choose this?</li><li>Give immediate feedback for new skills; delayed feedback can work for practised ones.</li><li>Never rely on colour alone (green tick / red cross). Use words and icons too.</li></ul>`,
+  blocks:[{panel:"Feedback strategy",items:[
+    {t:"row",items:[{t:"select",k:"fbtiming",label:"Timing",opts:["","Immediate, after each answer","After each attempt","End of section","End of course","Mixed"]},{t:"select",k:"fbattempts",label:"On a wrong answer",opts:["","Explain, then show the answer","Hint, then try again","Show consequence, then retry","Move on, review at the end"]}]},
+    {t:"chips",k:"fbtypes",label:"Types of feedback",opts:["Corrective (right / wrong)","Explanatory (why)","Elaborative (extra detail)","Consequence-based","Directive (what next)","Encouraging","Peer or supervisor feedback"]}
+  ]},{panel:"Feedback wording",sub:"Templates you can reuse in the build. Placeholders in square brackets.",items:[
+    {t:"textarea",k:"fbcorrect",label:"Correct answer",ph:"That's right. [Why it's right]. On site, this means [real consequence]."},
+    {t:"textarea",k:"fbincorrect",label:"Incorrect answer",ph:"Not quite. The safer choice is [answer], because [reason]. Have another look at [section]."},
+    {t:"textarea",k:"fbpartial",label:"Partly correct",ph:"You're partly there. [What they got right]. You also need to [missing step]."},
+    {t:"textarea",k:"fbend",label:"End of module / results",ph:"You scored [x]%. You're confident on [topics]. Before you go on site, review [topic]."}
+  ]},{panel:"Feedback checks",items:[
+    {t:"checks",k:"fb",items:[["Explains why, not just right or wrong"],["Points to a next step or section to revisit"],["Focuses on the task, never blames the learner"],["Plain English, consistent tone"],["Doesn't rely on colour alone"],["Feedback layers are reachable by keyboard and screen reader"]]}
+  ]}]},
+ {id:"access",name:"Accessibility",intro:"Check against WCAG 2.2 AA and Story's inclusive design principles.",
+  guide:`<p>WCAG 2.2 AA is the baseline. Inclusive design goes further: plain English, short chunks and predictable layouts help everyone, especially neurodivergent learners and those with English as an additional language.</p><ul><li>Test with a keyboard only, then with a screen reader (NVDA or VoiceOver).</li><li>Test on a phone at 320px width and at 200% zoom.</li><li>Check contrast with a contrast checker, including text on Story Blue.</li><li>New in 2.2: focus not obscured, target size, dragging alternatives, consistent help, redundant entry and accessible authentication.</li></ul>`,
+  blocks:[{panel:"WCAG 2.2 AA",items:[
+    {t:"checks",k:"wc",groups:[
+     ["Perceivable",[["Meaningful images have alt text; decorative images are hidden","1.1.1"],["Video has captions; audio has a transcript","1.2.2"],["Headings, lists and tables use real structure","1.3.1"],["Information isn't conveyed by colour alone","1.4.1"],["Text contrast at least 4.5:1 (3:1 for large text)","1.4.3"],["Works at 320px wide and 400% zoom without sideways scrolling","1.4.10"],["UI and graphics contrast at least 3:1","1.4.11"]]],
+     ["Operable",[["Everything works with a keyboard alone","2.1.1"],["Timings can be turned off or extended","2.2.1"],["No content flashes more than 3 times a second","2.3.1"],["Logical focus order","2.4.3"],["Link and button text makes sense out of context","2.4.4"],["Focus is visible and not hidden behind other content","2.4.11"],["Drag-and-drop has a click or tap alternative","2.5.7"],["Touch targets at least 24 × 24px","2.5.8"]]],
+     ["Understandable",[["Page or course language is set","3.1.1"],["Navigation and help appear in the same place each time","3.2.6"],["Errors are identified and explained in text","3.3.1"],["Learners aren't asked to re-enter the same information","3.3.7"],["Login doesn't depend on memory puzzles","3.3.8"]]],
+     ["Robust",[["Custom controls have accessible names and roles","4.1.2"],["Status messages are announced to screen readers","4.1.3"]]]
+    ]}
+  ]},{panel:"Inclusive design",items:[
+    {t:"checks",k:"inc",items:[["Plain English: short sentences, active voice, everyday words"],["Jargon and acronyms explained the first time"],["Chunks of 5 to 10 minutes with visible progress"],["One idea per screen; clear goal at the start of each section"],["Left-aligned sans-serif text, no long italic or capitalised passages"],["Audio is optional and has a text alternative"],["Tested on a learner's own phone (BYOD)"],["Tested with a screen reader"]]},
+    {t:"textarea",k:"a11ynotes",label:"Accessibility notes and fixes",hint:"Issues found, who's fixing them, and any reasonable adjustments offered."}
+  ]}]},
+ {id:"build",name:"Build & QA",intro:"Build, test, sign off and launch on Actus.",
+  guide:`<p>Test early on the real platform. Publishing quirks, tracking and mobile layout are much cheaper to fix before sign-off.</p><ul><li>Agree the tracking rule (completion, pass/fail or both) before publishing.</li><li>Test the SCORM package in SCORM Cloud, then on the Actus test area.</li><li>Run a pilot with a few real learners and capture their feedback.</li><li>Keep a version log and an editable source file in the team folder.</li></ul>`,
+  blocks:[{panel:"Build settings",items:[
+    {t:"row",items:[{t:"select",k:"tool",label:"Authoring tool",opts:["","Articulate Rise 360","Articulate Storyline 360","PowerPoint / Teams","Other"]},{t:"select",k:"scorm",label:"Package type",opts:["","SCORM 1.2","SCORM 2004 (3rd ed.)","SCORM 2004 (4th ed.)","xAPI (Tin Can)","cmi5","Not packaged"]}]},
+    {t:"row",items:[{t:"text",k:"tracking",label:"Tracking rule",hint:"e.g. Complete when quiz passed at 80%"},{t:"text",k:"version",label:"Version",hint:"e.g. v1.0, 12/11/26"}]}
+  ]},{panel:"Checklist",items:[
+    {t:"checks",k:"qa",groups:[
+     ["Build",[["Story brand applied: colours, Montserrat headings, Arial body"],["Spelling, grammar and plain English check"],["All media licensed and credited"],["Source file saved to the team folder"]]],
+     ["Testing",[["Tested in SCORM Cloud"],["Tested on the Actus test area: launch, resume, completion"],["Tested on Android phone"],["Tested on iPhone"],["Tested on Windows laptop (Edge and Chrome)"],["Pilot with real learners"]]],
+     ["Sign-off",[["SME sign-off on accuracy"],["Sponsor sign-off"],["Health & safety or compliance sign-off (if needed)"]]],
+     ["Launch",[["Enrolment rules and due dates set on Actus"],["Launch comms sent to learners and line managers"],["Review date set"]]]
+    ]},
+    {t:"row",items:[{t:"text",k:"reviewers",label:"Reviewers"},{t:"date",k:"launch",label:"Launch date"}]}
+  ]}]},
+ {id:"eval",name:"Evaluation",intro:"Plan how you'll show the learning worked, using Kirkpatrick's four levels.",
+  guide:`<p>Plan evaluation now, from Level 4 backwards. Agree the Level 4 measure with the sponsor at the start so you have a baseline.</p><ul><li><b>Level 1 Reaction:</b> did they find it relevant and usable?</li><li><b>Level 2 Learning:</b> did they gain the knowledge and skill? (assessment scores, confidence before and after)</li><li><b>Level 3 Behaviour:</b> are they doing it on the job? (observations, supervisor check-ins, audits)</li><li><b>Level 4 Results:</b> did the business result move? (incidents, rework, audit scores)</li></ul>`,
+  custom:"kirk"},
+ {id:"brief",name:"Design brief",intro:"Everything you've captured, as one brief to share with your sponsor and SMEs.",custom:"brief"}
+];
+const KIRK = [
+ {l:1,name:"Reaction",q:"Did learners find it relevant, engaging and usable?",ex:"End-of-module survey: relevance, ease of use, confidence (1–5) plus one open question"},
+ {l:2,name:"Learning",q:"Did they gain the knowledge, skill and confidence?",ex:"Assessment scores; confidence rating before and after"},
+ {l:3,name:"Behaviour",q:"Are they applying it on the job?",ex:"Supervisor observation checklist at 4 and 12 weeks; site safety tours"},
+ {l:4,name:"Results",q:"Did the business result improve?",ex:"Manual handling incidents and RIDDORs from accident reporting, against the 12-month baseline"}
+];
+
+/* ---------- Worked example ---------- */
+const EXAMPLE = {
+ id:"__example", name:"Example: Manual Handling Refresher", example:true, updated:0,
+ fields:{
+  requester:"SHEQ Manager", sponsor:"Operations Director", sme:"Site Safety Advisor; Plant Supervisor", deadline:"2027-01-29",
+  problem:"Manual handling injuries on rail sites have risen over two quarters, mostly lifting from track level and carrying sleepers and rail components.",
+  context:"Incident trend review and an internal audit action.", delivery:["Actus eLearning (Rise)","Toolbox talk"], duration:"20 minutes online + 15-minute toolbox talk", mandatory:"Mandatory / compliance",
+  constraints:"Must be completed on a phone during a shift break. Toolbox talk delivered by supervisors.",
+  goal:"Reduce manual handling incidents by 25% over 12 months.", current:"Operatives lift from track level with a bent back and carry loads alone instead of using lifting aids.", desired:"Operatives plan each lift with TILE, use lifting aids or a team lift, and stop the job when a lift isn't safe.",
+  evidence:"Accident reports (14 incidents in 6 months), two near-miss reports, site observations on two projects.",
+  causes:["Skill / practice","Tools or equipment","Time / workload"], nontraining:"Plant team to check lifting aid availability per site (owner: Plant Manager). Planners to allow time for team lifts in short possessions.",
+  roles:"Track operatives, labourers, supervisors", headcount:"About 350", workpattern:"Site-based", digital:"Mixed", devices:["Own phone (BYOD)","No device: face to face only"],
+  prior:"All hold PTS. Most completed generic manual handling eLearning at induction.", motivation:"Want quick, practical content. Generic training seen as box-ticking.",
+  inclusion:"Some colleagues have English as an additional language; mixed literacy; noisy sites, so captions essential.", persona:"\"I've done this for 20 years. Show me something I don't know, and keep it short.\"",
+  passmark:"80%", attempts:"Unlimited, with feedback", formative:"Two spot-the-hazard checks and one branching scenario.", summative:"Supervisor observes a planned lift on site within 4 weeks and signs it off.",
+  modality:["Actus eLearning (Rise)","Toolbox talk"], interactions:["Scenario / branching","Hotspot / spot the hazard","Video","Downloadable job aid"], seat:"20 minutes", tone:"Conversational and direct",
+  hook:"A short video: Dave has 10 minutes left in a possession and three sleepers to move.", chunking:"1. Why it matters (3 min)\n2. TILE in action (7 min)\n3. Spot the hazard (5 min)\n4. Dave's decision (5 min)",
+  fbtiming:"Immediate, after each answer", fbattempts:"Show consequence, then retry", fbtypes:["Explanatory (why)","Consequence-based","Directive (what next)"],
+  fbcorrect:"That's right. Using the sleeper trolley keeps the load off your back. On site, this means fewer strains and no lost shifts.",
+  fbincorrect:"Not quite. Lifting alone from track level puts your lower back at risk. The safer choice is a team lift or the trolley. Have another look at 'TILE in action'.",
+  tool:"Articulate Rise 360", scorm:"SCORM 1.2", tracking:"Complete when final scenario passed", version:"v0.3 draft",
+  ev_1_measure:"Relevance and confidence ratings", ev_1_method:"5-question survey at the end", ev_1_timing:"On completion", ev_1_owner:"L&D",
+  ev_2_measure:"Scenario score", ev_2_method:"Actus quiz report", ev_2_timing:"On completion", ev_2_owner:"L&D",
+  ev_3_measure:"Safe lifts observed", ev_3_method:"Supervisor observation checklist", ev_3_timing:"4 and 12 weeks", ev_3_owner:"Site supervisors",
+  ev_4_measure:"Manual handling incidents", ev_4_method:"Accident reporting system", ev_4_timing:"Quarterly for 12 months", ev_4_owner:"SHEQ"
+ },
+ checks:{"na.0":true,"na.1":true,"na.2":true,"na.4":true,"wc.0.0":true,"wc.0.1":true,"wc.0.3":true,"inc.0":true,"inc.2":true,"as.0":true,"as.1":true},
+ objectives:[
+  {id:"o1",level:3,text:"apply the TILE assessment before every manual lift on site",method:"Scenario-based question",activity:"Guided practice with a TILE card"},
+  {id:"o2",level:4,text:"spot unsafe lifting practices in a site photo or video",method:"Spot-the-hazard image or video",activity:"Hotspot image exploration"},
+  {id:"o3",level:5,text:"decide when to stop a job and ask for a lifting aid or team lift",method:"Branching scenario with consequences",activity:"Branching scenario"}
+ ],
+ screens:[
+  {id:"s1",title:"Dave's possession",obj:"o3",content:"Video: Dave has three sleepers to move and the clock is ticking.",interaction:"Video",media:"30-second video, captioned",alt:"Captions and transcript"},
+  {id:"s2",title:"TILE in action",obj:"o1",content:"Task, Individual, Load, Environment, each with a real site example.",interaction:"Tabs / accordion",media:"4 site photos",alt:"Alt text describing each lift"},
+  {id:"s3",title:"Spot the hazard",obj:"o2",content:"Learners find 4 unsafe practices in a track-level photo.",interaction:"Hotspot / spot the hazard",media:"1 annotated photo",alt:"List-based alternative for screen readers"}
+ ]
+};
+
+/* ---------- State ---------- */
+let projects = [];          // user's projects
+let cur = null;             // current project object
+let stageId = "setup";
+const ui = {level:3, verb:"", what:"", cond:""};
+let mode = "starting";      // "db" | "local" | "starting"
+let db = null, userId = null, downloads = null;
+const dirty = new Set();
+let saveTimer = null, saving = false;
+
+const blank = () => ({id:uid(), name:"Untitled project", updated:Date.now(), fields:{}, checks:{}, objectives:[], screens:[]});
+const clone = o => JSON.parse(JSON.stringify(o));
+const F = k => cur.fields[k] ?? "";
+const arr = k => Array.isArray(cur.fields[k]) ? cur.fields[k] : [];
+
+/* ---------- Progress ---------- */
+function stageKeys(st){
+  const f=[], c=[];
+  const walk = items => items.forEach(it => {
+    if (it.t==="row") walk(it.items);
+    else if (it.t==="checks"){
+      if (it.groups) it.groups.forEach((g,gi)=>g[1].forEach((_,i)=>c.push(`${it.k}.${gi}.${i}`)));
+      else it.items.forEach((_,i)=>c.push(`${it.k}.${i}`));
+    } else if (it.k && !String(it.k).startsWith("fbpartial") && it.k!=="fbend") f.push(it.k);
+  });
+  (st.blocks||[]).forEach(b=>walk(b.items));
+  return {f,c};
+}
+function progress(st){
+  if (st.id==="brief") return null;
+  const {f,c} = stageKeys(st);
+  let tot = f.length + c.length, got = 0;
+  f.forEach(k => { const v = cur.fields[k]; if (Array.isArray(v) ? v.length : String(v??"").trim()) got++; });
+  c.forEach(k => { if (cur.checks[k]) got++; });
+  if (st.custom==="bloom"){ tot += 3; got += Math.min(3, cur.objectives.length); }
+  if (st.custom==="assess"){ tot += cur.objectives.length; got += cur.objectives.filter(o=>o.method).length; }
+  if (st.custom==="storyboard"){ tot += 2; got += Math.min(2, cur.screens.length); }
+  if (st.custom==="kirk"){ for (let l=1;l<=4;l++) ["measure","method","timing","owner"].forEach(p=>{ tot++; if (String(cur.fields[`ev_${l}_${p}`]??"").trim()) got++; }); }
+  return tot ? Math.round(got/tot*100) : 0;
+}
+function renderRail(){
+  let sum=0,n=0;
+  $("#rail").innerHTML = STAGES.map((st,i) => {
+    const p = progress(st);
+    if (p!==null){ sum+=p; n++; }
+    const done = p===100;
+    return `<li class="${done?"done":""}"><button type="button" data-goto="${st.id}" ${st.id===stageId?'aria-current="step"':""}>
+      <span class="no" aria-hidden="true">${done?"✓":i+1}</span><span class="nm">${esc(st.name)}</span><span class="pc">${p===null?"":p+"%"}</span></button></li>`;
+  }).join("");
+  const o = n ? Math.round(sum/n) : 0;
+  $("#overallTxt").textContent = `${o}% of the design complete`;
+  $("#overallBar").style.width = o+"%";
+}
+
+/* ---------- Field rendering ---------- */
+function fieldHTML(it){
+  const id = "f-"+it.k;
+  const lab = it.label ? `<label for="${id}">${esc(it.label)}</label>` : "";
+  const hint = it.hint ? `<p class="hint" id="${id}-h">${esc(it.hint)}</p>` : "";
+  const desc = it.hint ? ` aria-describedby="${id}-h"` : "";
+  switch(it.t){
+    case "row": return `<div class="grid2">${it.items.map(fieldHTML).join("")}</div>`;
+    case "text": case "date":
+      return `<div class="field">${lab}${hint}<input type="${it.t}" id="${id}" data-k="${it.k}" value="${esc(F(it.k))}"${desc}></div>`;
+    case "textarea":
+      return `<div class="field">${lab}${hint}<textarea id="${id}" data-k="${it.k}"${desc} placeholder="${esc(it.ph||"")}">${esc(F(it.k))}</textarea></div>`;
+    case "select":
+      return `<div class="field">${lab}${hint}<select id="${id}" data-k="${it.k}"${desc}>${it.opts.map(o=>`<option value="${esc(o)}" ${F(it.k)===o?"selected":""}>${o?esc(o):"Choose…"}</option>`).join("")}</select></div>`;
+    case "chips":
+      return `<div class="field" role="group" aria-labelledby="${id}-l"><span class="lbl" id="${id}-l">${esc(it.label)}</span>${hint}<div class="chips">${it.opts.map(o=>`<button type="button" class="chip" data-chip="${it.k}" data-val="${esc(o)}" aria-pressed="${arr(it.k).includes(o)}">${esc(o)}</button>`).join("")}</div></div>`;
+    case "checks": {
+      const one = (key,label,ref) => `<label class="ck ${cur.checks[key]?"on":""}"><input type="checkbox" id="c-${key}" data-c="${key}" ${cur.checks[key]?"checked":""}><span>${esc(label)}${ref?`<span class="ref">${ref}</span>`:""}</span></label>`;
+      if (it.groups) return `<div class="checks">${it.groups.map((g,gi)=>`<h4>${esc(g[0])}</h4>${g[1].map((x,i)=>one(`${it.k}.${gi}.${i}`,x[0],x[1])).join("")}`).join("")}</div>`;
+      return `<div class="checks">${it.items.map((x,i)=>one(`${it.k}.${i}`,x[0],x[1])).join("")}</div>`;
+    }
+    case "custom": return `<div data-custom="${it.render}">${CUSTOM[it.render]()}</div>`;
+  }
+  return "";
+}
+const panelHTML = b => `<section class="panel"><h3>${esc(b.panel)}</h3>${b.sub?`<p class="sub">${esc(b.sub)}</p>`:""}${b.items.map(fieldHTML).join("")}</section>`;
+
+/* ---------- Custom blocks ---------- */
+const CUSTOM = {
+  causeReadout(){
+    const c = arr("causes");
+    if (!c.length) return `<div class="readout">Choose the causes above to see whether learning is likely to close the gap.</div>`;
+    const train = c.filter(x=>x==="Knowledge"||x==="Skill / practice").length;
+    const other = c.length - train;
+    if (train && !other) return `<div class="readout good"><b>Learning is likely the right fix.</b> The causes are knowledge and skill. Focus the design on realistic practice.</div>`;
+    if (train && other) return `<div class="readout warn"><b>Learning is part of the answer.</b> Some causes are outside training (${esc(c.filter(x=>x!=="Knowledge"&&x!=="Skill / practice").join(", ").toLowerCase())}). Agree owners for those fixes, or the training won't stick.</div>`;
+    return `<div class="readout warn"><b>Training probably won't fix this on its own.</b> None of the causes are knowledge or skill. Talk to the sponsor about process, tools, workload or communication fixes first.</div>`;
+  }
+};
+
+function bloomHTML(){
+  const L = BLOOM[ui.level-1];
+  const verb = ui.verb || L.verbs[0];
+  const sentence = `By the end, learners will be able to <b>${esc(verb)}</b> ${ui.what?esc(ui.what):"<em>[what]</em>"}${ui.cond?" "+esc(ui.cond):""}.`;
+  const counts = BLOOM.map(b=>cur.objectives.filter(o=>o.level===b.n).length);
+  const total = cur.objectives.length;
+  return `
+  <section class="panel"><h3>1. Pick a level</h3><p class="sub">Lower levels build knowledge; higher levels build judgement. Choose the level the job actually needs.</p>
+    <div class="stair" role="group" aria-label="Bloom's levels, lowest to highest">${BLOOM.map(b=>`<button type="button" class="step l${b.n}" data-level="${b.n}" aria-pressed="${ui.level===b.n}">${b.name}<small>Level ${b.n}</small></button>`).join("")}</div>
+    <div class="lvl-info">
+      <div class="field"><span class="lbl">${esc(L.name)}: ${esc(L.desc)}</span><p class="hint">Choose a verb</p>
+        <div class="verbs" role="group" aria-label="${esc(L.name)} verbs">${L.verbs.map(v=>`<button type="button" class="chip" data-verb="${esc(v)}" aria-pressed="${verb===v}">${esc(v)}</button>`).join("")}</div></div>
+      <div class="field"><span class="lbl">Fits well with</span>
+        <ul style="margin:0;padding-left:1.1em;font-size:14px">${L.assess.slice(0,3).map(a=>`<li>${esc(a)}</li>`).join("")}</ul>
+        <p class="hint" style="margin-top:6px">Practice: ${esc(L.act.join(" · "))}</p></div>
+    </div>
+  </section>
+  <section class="panel"><h3>2. Write the outcome</h3>
+    <div class="composer">
+      <div class="field"><label for="b-verb">Verb</label><select id="b-verb">${L.verbs.map(v=>`<option ${verb===v?"selected":""}>${esc(v)}</option>`).join("")}</select></div>
+      <div class="field"><label for="b-what">What</label><input type="text" id="b-what" value="${esc(ui.what)}" placeholder="e.g. the TILE assessment before a manual lift"></div>
+      <div class="field"><label for="b-cond">Condition or standard <span style="font-weight:normal;color:var(--muted)">(optional)</span></label><input type="text" id="b-cond" value="${esc(ui.cond)}" placeholder="e.g. using the site lift plan"></div>
+    </div>
+    <div class="preview" id="b-prev" aria-live="polite">${sentence}</div>
+    <div><button class="btn primary" type="button" data-act="addObj">Add outcome</button></div>
+  </section>
+  <section class="panel"><h3>Your outcomes <span style="font-weight:normal;color:var(--muted);font-size:14px">(${total})</span></h3>
+    ${total?`<div><div class="dist" role="img" aria-label="Outcomes by level: ${BLOOM.map((b,i)=>`${b.name} ${counts[i]}`).join(", ")}">${BLOOM.map((b,i)=>counts[i]?`<span style="width:${counts[i]/total*100}%;background:var(--b${b.n})"></span>`:"").join("")}</div>
+      <div class="legend">${BLOOM.map((b,i)=>`<span><i style="background:var(--b${b.n})"></i>${b.name} ${counts[i]}</span>`).join("")}</div></div>`:""}
+    ${total && Math.max(...counts.slice(2))===0?`<div class="readout warn"><b>All outcomes are at Remember or Understand.</b> For workplace learning, add at least one Apply-level outcome or higher.</div>`:""}
+    ${total?`<ol class="olist">${cur.objectives.map((o,i)=>`<li class="oitem">
+      <span class="badge"><i style="background:var(--b${o.level})"></i>${BLOOM[o.level-1].name}</span>
+      <div class="field"><label class="sr" for="o-${o.id}" style="position:absolute;left:-9999px">Outcome ${i+1}</label><input type="text" id="o-${o.id}" data-obj="${o.id}" data-prop="text" value="${esc(o.text)}">
+      ${VAGUE.test(o.text)?`<span class="flag">Hard to measure: swap the vague verb for an observable one.</span>`:""}</div>
+      <button class="btn small" type="button" data-act="delObj" data-id="${o.id}" aria-label="Remove outcome ${i+1}">Remove</button></li>`).join("")}</ol>
+      <p class="hint">Each outcome reads: "By the end, learners will be able to …"</p>`
+    :`<div class="empty">No outcomes yet. Pick a level, choose a verb and add your first outcome.</div>`}
+  </section>`;
+}
+
+function assessHTML(){
+  if (!cur.objectives.length) return `<section class="panel"><h3>Alignment</h3><div class="empty">Add learning outcomes first, then come back to match each one to an assessment. <button class="btn small" type="button" data-goto="outcomes">Go to outcomes</button></div></section>`;
+  return `<section class="panel"><h3>Alignment</h3><p class="sub">Suggestions match each outcome's level. Pick one or type your own.</p>
+  <div class="tbl-wrap"><table><thead><tr><th style="width:32%">Outcome</th><th style="width:30%">Assessment</th><th>Practice activity</th></tr></thead><tbody>
+  ${cur.objectives.map(o=>{ const L=BLOOM[o.level-1]; const opts=[...new Set([...L.assess, ...(o.method && !L.assess.includes(o.method)?[o.method]:[])])];
+    return `<tr><td class="lvlcell">${esc(o.text||"(untitled outcome)")}<small>${L.name} · level ${L.n}</small></td>
+    <td><label for="am-${o.id}" style="position:absolute;left:-9999px">Assessment</label><select id="am-${o.id}" data-obj="${o.id}" data-prop="method"><option value="">Choose…</option>${opts.map(a=>`<option ${o.method===a?"selected":""}>${esc(a)}</option>`).join("")}</select>
+      <textarea style="margin-top:6px" data-obj="${o.id}" data-prop="anote" aria-label="Assessment notes" placeholder="Notes, question ideas">${esc(o.anote||"")}</textarea></td>
+    <td><textarea data-obj="${o.id}" data-prop="activity" aria-label="Practice activity" placeholder="${esc(L.act[0])}">${esc(o.activity||"")}</textarea></td></tr>`; }).join("")}
+  </tbody></table></div></section>`;
+}
+
+function storyboardHTML(){
+  const objOpts = sel => `<option value="">Not linked</option>`+cur.objectives.map((o,i)=>`<option value="${o.id}" ${sel===o.id?"selected":""}>${i+1}. ${esc((o.text||"").slice(0,60))}</option>`).join("");
+  return `<section class="panel"><h3>Storyboard</h3><p class="sub">One card per screen or section, in running order.</p>
+  ${cur.screens.length?`<ol class="sb">${cur.screens.map((s,i)=>`<li class="scr">
+    <div class="scr-h"><span class="n">${String(i+1).padStart(2,"0")}</span>
+      <input type="text" data-scr="${s.id}" data-prop="title" value="${esc(s.title)}" aria-label="Screen ${i+1} title" placeholder="Screen title">
+      <span class="tools"><button class="btn small" type="button" data-act="upScr" data-id="${s.id}" ${i===0?"disabled":""} aria-label="Move screen ${i+1} up">↑</button><button class="btn small" type="button" data-act="downScr" data-id="${s.id}" ${i===cur.screens.length-1?"disabled":""} aria-label="Move screen ${i+1} down">↓</button><button class="btn small" type="button" data-act="delScr" data-id="${s.id}">Remove</button></span></div>
+    <div class="grid2">
+      <div class="field"><label for="so-${s.id}">Outcome</label><select id="so-${s.id}" data-scr="${s.id}" data-prop="obj">${objOpts(s.obj)}</select></div>
+      <div class="field"><label for="si-${s.id}">Interaction</label><input type="text" id="si-${s.id}" data-scr="${s.id}" data-prop="interaction" value="${esc(s.interaction)}" placeholder="e.g. Hotspot"></div>
+    </div>
+    <div class="field"><label for="sc-${s.id}">Content and on-screen text</label><textarea id="sc-${s.id}" data-scr="${s.id}" data-prop="content">${esc(s.content)}</textarea></div>
+    <div class="grid2">
+      <div class="field"><label for="sm-${s.id}">Media</label><input type="text" id="sm-${s.id}" data-scr="${s.id}" data-prop="media" value="${esc(s.media)}" placeholder="Images, video, audio"></div>
+      <div class="field"><label for="sa-${s.id}">Accessibility notes</label><input type="text" id="sa-${s.id}" data-scr="${s.id}" data-prop="alt" value="${esc(s.alt)}" placeholder="Alt text, captions, keyboard alternative"></div>
+    </div></li>`).join("")}</ol>`:`<div class="empty">No screens yet. Add your first screen to start the storyboard.</div>`}
+  <div><button class="btn primary" type="button" data-act="addScr">+ Add screen</button></div></section>`;
+}
+
+function kirkHTML(){
+  return `<section class="panel"><h3>Evaluation plan</h3>
+  <div class="tbl-wrap"><table><thead><tr><th style="width:20%">Level</th><th>What you'll measure</th><th>Method / data source</th><th style="width:14%">When</th><th style="width:14%">Owner</th></tr></thead><tbody>
+  ${KIRK.map(k=>`<tr><td class="lvlcell">${k.l}. ${k.name}<small>${esc(k.q)}</small></td>
+   ${["measure","method","timing","owner"].map(p=>`<td><textarea data-k="ev_${k.l}_${p}" aria-label="Level ${k.l} ${p}" placeholder="${p==="measure"?esc(k.ex):""}">${esc(F(`ev_${k.l}_${p}`))}</textarea></td>`).join("")}</tr>`).join("")}
+  </tbody></table></div>
+  <div class="field"><label for="f-baseline">Baseline and target</label><p class="hint">The Level 4 starting point and what success looks like.</p><textarea id="f-baseline" data-k="baseline">${esc(F("baseline"))}</textarea></div>
+  </section>`;
+}
+
+/* ---------- Brief ---------- */
+function briefData(){
+  const g = k => { const v=cur.fields[k]; return Array.isArray(v)?v.join(", "):String(v??"").trim(); };
+  const ck = (prefix) => { const keys=Object.keys(cur.checks).filter(k=>k.startsWith(prefix+".")&&cur.checks[k]); return keys.length; };
+  const tot = st => stageKeys(STAGES.find(s=>s.id===st)).c.length;
+  return {g, ck, tot};
+}
+function briefSections(){
+  const {g, ck} = briefData();
+  const totOf = k => { let n=0; STAGES.forEach(st=>stageKeys(st).c.forEach(c=>{ if(c.startsWith(k+".")) n++; })); return n; };
+  return [
+   ["Overview",[["Problem",g("problem")],["Why now",g("context")],["Requested by",g("requester")],["Sponsor",g("sponsor")],["SMEs",g("sme")],["Target launch",fmtDate(g("deadline"))],["Status",g("mandatory")],["Delivery",g("delivery")],["Learner time",g("duration")],["Constraints",g("constraints")]]],
+   ["Needs analysis",[["Business goal",g("goal")],["Current performance",g("current")],["Desired performance",g("desired")],["Evidence",g("evidence")],["Root causes",g("causes")],["Non-training actions",g("nontraining")]]],
+   ["Learners",[["Roles",g("roles")],["Number",g("headcount")],["Work pattern",g("workpattern")],["Digital confidence",g("digital")],["Devices",g("devices")],["Prior knowledge",g("prior")],["Motivation and barriers",g("motivation")],["Inclusion",g("inclusion")],["Persona",g("persona")]]],
+   ["Learning outcomes",null,"outcomes"],
+   ["Assessment",[["Pass mark",g("passmark")],["Attempts",g("attempts")],["Formative",g("formative")],["Summative",g("summative")]]],
+   ["Design",[["Format",g("modality")],["Interactions",g("interactions")],["Seat time",g("seat")],["Tone",g("tone")],["Opening hook",g("hook")],["Structure",g("chunking")]]],
+   ["Storyboard",null,"screens"],
+   ["Feedback",[["Timing",g("fbtiming")],["Wrong answers",g("fbattempts")],["Types",g("fbtypes")],["Correct template",g("fbcorrect")],["Incorrect template",g("fbincorrect")]]],
+   ["Accessibility",[["WCAG 2.2 AA checks",`${ck("wc")} of ${totOf("wc")} done`],["Inclusive design checks",`${ck("inc")} of ${totOf("inc")} done`],["Notes",g("a11ynotes")]]],
+   ["Build & QA",[["Authoring tool",g("tool")],["Package",g("scorm")],["Tracking",g("tracking")],["Version",g("version")],["QA checks",`${ck("qa")} of ${totOf("qa")} done`],["Launch date",fmtDate(g("launch"))]]],
+   ["Evaluation",null,"kirk"]
+  ];
+}
+function fmtDate(s){ if(!s) return ""; const d=new Date(s+"T12:00:00"); return isNaN(d)?s:d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}); }
+function briefHTML(forExport){
+  const secs = briefSections();
+  const missing = "<span class=\"gap\">Not yet captured</span>";
+  const body = secs.map(([title,rows,special])=>{
+    let inner="";
+    if (special==="outcomes") inner = cur.objectives.length?`<p>By the end, learners will be able to:</p><ul>${cur.objectives.map(o=>`<li>${esc(o.text)} <small>(${BLOOM[o.level-1].name}${o.method?"; assessed by "+esc(o.method.toLowerCase()):""})</small></li>`).join("")}</ul>`:`<p>${missing}</p>`;
+    else if (special==="screens") inner = cur.screens.length?`<ol>${cur.screens.map(s=>`<li><b>${esc(s.title||"Untitled")}</b>${s.interaction?" · "+esc(s.interaction):""}${s.content?`<br>${esc(s.content)}`:""}</li>`).join("")}</ol>`:`<p>${missing}</p>`;
+    else if (special==="kirk") inner = `<dl>${KIRK.map(k=>{ const m=String(cur.fields[`ev_${k.l}_measure`]||"").trim(), me=String(cur.fields[`ev_${k.l}_method`]||"").trim(), t=String(cur.fields[`ev_${k.l}_timing`]||"").trim(), o=String(cur.fields[`ev_${k.l}_owner`]||"").trim();
+        return `<dt>Level ${k.l} ${k.name}</dt><dd>${m?esc([m,me&&"via "+me,t&&"("+t+")",o&&"owner: "+o].filter(Boolean).join(" ")):missing}</dd>`; }).join("")}${String(cur.fields.baseline||"").trim()?`<dt>Baseline and target</dt><dd>${esc(cur.fields.baseline)}</dd>`:""}</dl>`;
+    else inner = `<dl>${rows.map(([l,v])=>`<dt>${esc(l)}</dt><dd>${v?esc(v).replace(/\n/g,"<br>"):missing}</dd>`).join("")}</dl>`;
+    return `<h4>${esc(title)}</h4>${inner}`;
+  }).join("");
+  const head = `<h3>${esc(cur.name)}</h3><p style="color:var(--muted);font-size:13px">Learning design brief · Story Contracting L&amp;D · ${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}</p>`;
+  return head+body;
+}
+function briefMarkdown(){
+  const secs = briefSections();
+  let md = `# ${cur.name}\n\nLearning design brief · Story Contracting L&D · ${new Date().toLocaleDateString("en-GB")}\n`;
+  secs.forEach(([title,rows,special])=>{
+    md += `\n## ${title}\n\n`;
+    if (special==="outcomes") md += cur.objectives.length ? "By the end, learners will be able to:\n\n"+cur.objectives.map(o=>`- ${o.text} (${BLOOM[o.level-1].name}${o.method?"; assessed by "+o.method.toLowerCase():""})`).join("\n")+"\n" : "_Not yet captured_\n";
+    else if (special==="screens") md += cur.screens.length ? cur.screens.map((s,i)=>`${i+1}. **${s.title||"Untitled"}**${s.interaction?" · "+s.interaction:""}${s.content?" — "+s.content.replace(/\n/g," "):""}`).join("\n")+"\n" : "_Not yet captured_\n";
+    else if (special==="kirk") md += KIRK.map(k=>`- **Level ${k.l} ${k.name}:** ${["measure","method","timing","owner"].map(p=>String(cur.fields[`ev_${k.l}_${p}`]||"").trim()).filter(Boolean).join(" · ")||"_Not yet captured_"}`).join("\n")+"\n";
+    else md += rows.map(([l,v])=>`- **${l}:** ${v?String(v).replace(/\n/g," "):"_Not yet captured_"}`).join("\n")+"\n";
+  });
+  return md;
+}
+function briefPage(){
+  return `<section><div class="actions">
+    <button class="btn primary" type="button" data-act="copyBrief">Copy as text</button>
+    <button class="btn" type="button" data-act="dlMd" data-dl>Download .md</button>
+    <button class="btn" type="button" data-act="dlHtml" data-dl>Download .html</button>
+  </div><article class="brief" id="briefDoc">${briefHTML()}</article></section>`;
+}
+function exportHTMLDoc(){
+  return `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(cur.name)} – design brief</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap">
+<style>body{font-family:Arial,sans-serif;color:#2d3238;max-width:860px;margin:0 auto;padding:0 20px 40px;line-height:1.55}header{background:#0061ad;color:#fff;padding:16px 20px;margin:0 -20px 20px;font-family:Montserrat,Arial,sans-serif;font-weight:600}h3,h4{font-family:Montserrat,Arial,sans-serif;font-weight:600}h3{color:#0061ad;font-size:22px;margin:0}h4{border-bottom:2px solid #dee0e1;padding-bottom:4px;margin:22px 0 6px}dl{display:grid;grid-template-columns:180px 1fr;gap:4px 14px}dt{color:#60666d;font-size:13px}dd{margin:0}.gap{color:#60666d;font-style:italic}</style></head>
+<body><header>Story Contracting · Learning Design Brief</header>${briefHTML(true)}</body></html>`;
+}
+
+/* ---------- Main render ---------- */
+function render(focusTop){
+  const st = STAGES.find(s=>s.id===stageId);
+  const i = STAGES.indexOf(st);
+  let html = `<div class="stage-head"><span class="eyebrow">Stage ${i+1} of ${STAGES.length}</span><h2>${esc(st.name)}</h2><p>${esc(st.intro)}</p></div>`;
+  if (st.guide) html += `<details class="guide" id="guide-${st.id}"><summary>Guide: how to approach this stage</summary><div class="gb">${st.guide}</div></details>`;
+  if (st.custom==="bloom") html += bloomHTML();
+  if (st.custom==="assess") html += assessHTML();
+  if (st.custom==="kirk") html += kirkHTML();
+  if (st.custom==="brief") html += briefPage();
+  (st.blocks||[]).forEach((b,bi)=>{ if (st.custom==="storyboard" && bi===0){ html += panelHTML(b) + storyboardHTML(); } else html += panelHTML(b); });
+  html += `<div class="pager">${i>0?`<button class="btn" type="button" data-goto="${STAGES[i-1].id}">← ${esc(STAGES[i-1].name)}</button>`:"<span></span>"}${i<STAGES.length-1?`<button class="btn primary" type="button" data-goto="${STAGES[i+1].id}">${esc(STAGES[i+1].name)} →</button>`:""}</div>`;
+  $("#main").innerHTML = html;
+  if (!downloads) document.querySelectorAll("[data-dl]").forEach(b=>b.hidden=true);
+  renderRail();
+  if (focusTop){ window.scrollTo({top:0}); $("#main").focus({preventScroll:true}); const rb=document.querySelector('.rail [aria-current="step"]'); if (rb && window.innerWidth<=860) rb.scrollIntoView({block:"nearest",inline:"center"}); }
+}
+function renderProjects(){
+  const sel = $("#pSel");
+  const opts = projects.slice().sort((a,b)=>(b.updated||0)-(a.updated||0)).map(p=>`<option value="${esc(p.id)}" ${cur&&cur.id===p.id?"selected":""}>${esc(p.name||"Untitled project")}</option>`);
+  opts.push(`<option value="__example" ${cur&&cur.example?"selected":""}>Example: Manual Handling Refresher</option>`);
+  sel.innerHTML = opts.join("");
+  $("#pName").value = cur ? cur.name : ""; $("#pName").readOnly = !!(cur && cur.example);
+  $("#exBanner").hidden = !(cur && cur.example);
+  $("#delBtn").disabled = !!(cur && cur.example);
+}
+function openProject(p){ cur = p; renderProjects(); render(true); }
+
+/* ---------- Persistence ---------- */
+const LS = "storyLDT.projects.v1";
+function lsRead(){ try { return JSON.parse(localStorage.getItem(LS)||"[]"); } catch(e){ return []; } }
+function lsWrite(){ try { localStorage.setItem(LS, JSON.stringify(projects)); return true; } catch(e){ return false; } }
+function setStatus(t,cls){ const s=$("#status"); s.textContent=t; s.className="status "+(cls||""); }
+function touch(){
+  if (!cur || cur.example) return;
+  cur.updated = Date.now();
+  dirty.add(cur.id);
+  setStatus("Unsaved changes","warn");
+  clearTimeout(saveTimer); saveTimer = setTimeout(flush, 900);
+}
+async function flush(){
+  if (saving){ clearTimeout(saveTimer); saveTimer=setTimeout(flush,400); return; }
+  const ids=[...dirty]; dirty.clear(); if (!ids.length) return;
+  saving = true;
+  try {
+    if (mode==="db"){
+      for (const id of ids){ const p=projects.find(x=>x.id===id); if (p) await db.collection("data/users/"+userId).doc(id).set(clone(p)); }
+      setStatus("Saved to your account","ok");
+    } else {
+      const ok=lsWrite(); setStatus(ok ? "Saved in this browser only" : "Not saved: storage unavailable","warn");
+    }
+  } catch(e){
+    ids.forEach(i=>dirty.add(i));
+    setStatus(e && e.code==="quota_exceeded" ? "Storage full: delete an old project" : "Couldn't save. Retrying…","warn");
+    if (!e || e.code!=="quota_exceeded" && e.code!=="invalid_argument"){ clearTimeout(saveTimer); saveTimer=setTimeout(flush,3000); }
+  } finally { saving=false; }
+}
+async function removeProject(id){
+  projects = projects.filter(p=>p.id!==id);
+  if (mode==="db"){ try { await db.collection("data/users/"+userId).doc(id).delete(); } catch(e){ toast("Couldn't delete. Try again."); } }
+  else lsWrite();
+}
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2600); }
+
+/* ---------- Events ---------- */
+const main = $("#main");
+main.addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.k){ cur.fields[el.dataset.k] = el.value; touch(); renderRail(); return; }
+  if (el.dataset.obj){ const o=cur.objectives.find(x=>x.id===el.dataset.obj); if(o){ o[el.dataset.prop]=el.value; touch(); renderRail();
+      if (el.dataset.prop==="text"){ const f=el.parentElement.querySelector(".flag"); const bad=VAGUE.test(el.value);
+        if (bad && !f) el.insertAdjacentHTML("afterend",`<span class="flag">Hard to measure: swap the vague verb for an observable one.</span>`); else if(!bad && f) f.remove(); } } return; }
+  if (el.dataset.scr){ const s=cur.screens.find(x=>x.id===el.dataset.scr); if(s){ s[el.dataset.prop]=el.value; touch(); } return; }
+  if (el.id==="b-what"||el.id==="b-cond"||el.id==="b-verb"){
+    ui.what=$("#b-what").value; ui.cond=$("#b-cond").value; ui.verb=$("#b-verb").value;
+    const L=BLOOM[ui.level-1];
+    $("#b-prev").innerHTML = `By the end, learners will be able to <b>${esc(ui.verb)}</b> ${ui.what?esc(ui.what):"<em>[what]</em>"}${ui.cond?" "+esc(ui.cond):""}.`;
+    document.querySelectorAll("[data-verb]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.verb===ui.verb));
+  }
+});
+main.addEventListener("change", e => {
+  const el=e.target;
+  if (el.dataset.c){ cur.checks[el.dataset.c]=el.checked; el.closest(".ck").classList.toggle("on",el.checked); touch(); renderRail(); }
+  if (el.tagName==="SELECT" && (el.dataset.k||el.dataset.obj||el.dataset.scr)) el.dispatchEvent(new Event("input",{bubbles:true}));
+});
+document.addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.goto){ stageId=b.dataset.goto; render(true); return; }
+  if (b.dataset.chip){ const k=b.dataset.chip, v=b.dataset.val; const a=arr(k).slice(); const i=a.indexOf(v); i>=0?a.splice(i,1):a.push(v); cur.fields[k]=a; b.setAttribute("aria-pressed", i<0); touch(); renderRail();
+    if (k==="causes"){ const c=document.querySelector('[data-custom="causeReadout"]'); if(c) c.innerHTML=CUSTOM.causeReadout(); } return; }
+  if (b.dataset.level){ ui.level=+b.dataset.level; ui.verb=""; render(); document.querySelector(`[data-level="${ui.level}"]`).focus(); return; }
+  if (b.dataset.verb){ ui.verb=b.dataset.verb; $("#b-verb").value=ui.verb; $("#b-verb").dispatchEvent(new Event("input",{bubbles:true})); return; }
+  const act=b.dataset.act; if (!act) return;
+  if (act==="addObj"){
+    const verb = ui.verb || BLOOM[ui.level-1].verbs[0];
+    if (!ui.what.trim()){ toast("Add what learners will do first."); $("#b-what").focus(); return; }
+    cur.objectives.push({id:uid(), level:ui.level, text:`${verb} ${ui.what.trim()}${ui.cond.trim()?" "+ui.cond.trim():""}`, method:"", activity:""});
+    ui.what=""; ui.cond=""; touch(); render(); toast("Outcome added"); $("#b-what").focus();
+  }
+  if (act==="delObj"){ cur.objectives=cur.objectives.filter(o=>o.id!==b.dataset.id); cur.screens.forEach(s=>{ if(s.obj===b.dataset.id) s.obj=""; }); touch(); render(); }
+  if (act==="addScr"){ cur.screens.push({id:uid(),title:"",obj:"",content:"",interaction:"",media:"",alt:""}); touch(); render(); const last=cur.screens[cur.screens.length-1]; const el=document.querySelector(`[data-scr="${last.id}"][data-prop="title"]`); el&&el.focus(); }
+  if (act==="delScr"){ cur.screens=cur.screens.filter(s=>s.id!==b.dataset.id); touch(); render(); }
+  if (act==="upScr"||act==="downScr"){ const i=cur.screens.findIndex(s=>s.id===b.dataset.id); const j=act==="upScr"?i-1:i+1; if(j<0||j>=cur.screens.length) return; [cur.screens[i],cur.screens[j]]=[cur.screens[j],cur.screens[i]]; touch(); render(); const nb=document.querySelector(`[data-act="${act}"][data-id="${b.dataset.id}"]`); nb&&!nb.disabled&&nb.focus(); }
+  if (act==="newProject"){ const p=blank(); projects.push(p); stageId="setup"; openProject(p); touch(); $("#pName").select(); $("#pName").focus(); }
+  if (act==="dupProject"){ const p=clone(cur); p.id=uid(); delete p.example; p.name=(cur.example?cur.name.replace(/^Example:\s*/,""):cur.name)+" (copy)"; p.updated=Date.now(); projects.push(p); openProject(p); touch(); toast("Copy created"); }
+  if (act==="delProject"){
+    if (!b.classList.contains("armed")){ b.classList.add("armed"); b.textContent="Confirm delete"; clearTimeout(b._t); b._t=setTimeout(()=>{ b.classList.remove("armed"); b.textContent="Delete"; },4000); return; }
+    b.classList.remove("armed"); b.textContent="Delete";
+    const name=cur.name; await removeProject(cur.id);
+    openProject(projects.slice().sort((a,b)=>(b.updated||0)-(a.updated||0))[0] || clone(EXAMPLE)); toast(`Deleted "${name}"`);
+  }
+  if (act==="copyBrief"){ const txt=briefMarkdown(); try { await navigator.clipboard.writeText(txt); toast("Brief copied"); } catch(err){ const r=document.createRange(); r.selectNodeContents($("#briefDoc")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast("Text selected: press Ctrl+C to copy"); } }
+  if (act==="dlMd"||act==="dlHtml"){
+    const base=(cur.name||"design-brief").replace(/[^\w\- ]+/g,"").trim().replace(/\s+/g,"-")||"design-brief";
+    try { await downloads.save(act==="dlMd"?{filename:base+"-brief.md",data:briefMarkdown()}:{filename:base+"-brief.html",data:exportHTMLDoc()}); toast("Download started"); }
+    catch(err){ if (err && err.code!=="declined") toast("Download isn't available here. Use Copy instead."); }
+  }
+});
+$("#pSel").addEventListener("change", e => {
+  const id=e.target.value;
+  if (id==="__example") openProject(clone(EXAMPLE)); else { const p=projects.find(x=>x.id===id); if(p) openProject(p); }
+});
+$("#pName").addEventListener("input", e => {
+  if (cur.example){ return; }
+  cur.name = e.target.value; touch();
+  const o=$("#pSel").querySelector(`option[value="${CSS.escape(cur.id)}"]`); if (o) o.textContent = cur.name || "Untitled project";
+});
+window.addEventListener("beforeunload", ()=>{ if (dirty.size && mode==="local") lsWrite(); });
+
+/* ---------- Boot ---------- */
+function boot(){
+  projects = lsRead();
+  mode = "local";
+  const start = projects.slice().sort((a,b)=>(b.updated||0)-(a.updated||0))[0];
+  openProject(start || clone(EXAMPLE));
+  setStatus("Connecting to your saved projects…");
+  const c = window.claude;
+  if (!c || !c.use){ setStatus(projects.length?"Saved in this browser only":"Projects save in this browser only","warn"); return; }
+  c.use("downloads").then(d=>{ downloads=d; if (d) document.querySelectorAll("[data-dl]").forEach(b=>b.hidden=false); }).catch(()=>{});
+  Promise.all([c.use("db"), c.use("user")]).then(async ([d,u]) => {
+    const id = u && u.id ? await u.id() : null;
+    if (!d || !id){ setStatus("Saved in this browser only","warn"); return; }
+    db=d; userId=id;
+    let first=true;
+    const timer = setTimeout(()=>{ if(first) setStatus("Can't reach saved projects yet","warn"); }, 10000);
+    db.collection("data/users/"+userId).onSnapshot(snap => {
+      if (snap.metadata.fromCache && first) return;
+      clearTimeout(timer);
+      const remote = snap.docs.map(x=>x.data()).filter(p=>p && p.id);
+      if (first){
+        first=false; mode="db";
+        // Move any browser-only projects into the account once
+        const local = projects.filter(p=>!remote.some(r=>r.id===p.id));
+        projects = remote.map(clone).concat(local);
+        local.forEach(p=>dirty.add(p.id));
+        if (local.length){ try{ localStorage.removeItem(LS); }catch(e){} flush(); }
+        const keep = cur && !cur.example ? projects.find(p=>p.id===cur.id) : null;
+        openProject(keep || projects.slice().sort((a,b)=>(b.updated||0)-(a.updated||0))[0] || clone(EXAMPLE));
+        setStatus(projects.length?"Saved to your account":"Projects save to your account","ok");
+        return;
+      }
+      // Later deliveries: pick up edits made in another tab/device
+      let changed=false;
+      remote.forEach(r=>{ const i=projects.findIndex(p=>p.id===r.id);
+        if (i<0){ projects.push(clone(r)); changed=true; }
+        else if ((r.updated||0) > (projects[i].updated||0) && !dirty.has(r.id)){ projects[i]=clone(r); changed=true; if (cur && cur.id===r.id){ cur=projects[i]; if(!main.contains(document.activeElement)) render(); } } });
+      if (changed) renderProjects();
+    }, err => { clearTimeout(timer); mode="local"; setStatus("Saved in this browser only","warn"); });
+  }).catch(()=>setStatus("Saved in this browser only","warn"));
+}
+boot();
+})();
+</script>
+
+</body>
+</html>
